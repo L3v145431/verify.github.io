@@ -16,14 +16,12 @@
       justify-content: center;
       min-height: 100vh;
     }
-
     h1 {
       color: #bb86fc;
       text-align: center;
       margin-bottom: 30px;
       animation: fadeIn 1.5s;
     }
-
     form {
       background-color: #1e1e1e;
       padding: 20px;
@@ -33,7 +31,6 @@
       max-width: 400px;
       animation: slideUp 1s;
     }
-
     input[type="text"] {
       width: 95%;
       padding: 10px;
@@ -43,7 +40,6 @@
       background-color: #2d2d2d;
       color: #e0e0e0;
     }
-
     button[type="submit"] {
       width: 100%;
       padding: 10px;
@@ -55,11 +51,9 @@
       font-weight: bold;
       transition: background-color 0.3s;
     }
-
     button[type="submit"]:hover {
       background-color: #9a67ea;
     }
-
     #resultado {
       margin-top: 20px;
       padding: 15px;
@@ -71,15 +65,12 @@
       max-width: 600px;
       animation: fadeIn 1.5s;
     }
-
     #resultado h2 {
       color: #bb86fc;
     }
-
     #resultado p {
       margin: 10px 0;
     }
-
     @keyframes fadeIn {
       from {
         opacity: 0;
@@ -88,7 +79,6 @@
         opacity: 1;
       }
     }
-
     @keyframes slideUp {
       from {
         transform: translateY(50px);
@@ -107,32 +97,45 @@
     <input type="text" id="idCertificado" placeholder="Ingresa el ID o Hash del certificado" required />
     <button type="submit">Verificar</button>
   </form>
-  <div id="resultado"></div>
+  <div id="resultado">
+    <p>Ingresa un ID o Hash para verificar un certificado.</p>
+  </div>
   <script>
-  document.getElementById('formularioVerificar').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const entrada = document.getElementById('idCertificado').value.trim();
-    const certificados = JSON.parse(localStorage.getItem('certificados') || '[]');
-    
-    // Buscar por ID o por hash
-    const encontrado = certificados.find(cert => cert.id === entrada || cert.hash === entrada);
-    const resultado = document.getElementById('resultado');
-    resultado.innerHTML = '';
+    document.addEventListener('DOMContentLoaded', function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const id = urlParams.get('id');
+      const hash = urlParams.get('hash');
 
-    if (encontrado) {
-      resultado.innerHTML = `
-        <h2>✅ Certificado Válido</h2>
-        <p><strong>Nombre:</strong> ${encontrado.nombre}</p>
-        <p><strong>Curso:</strong> ${encontrado.curso}</p>
-        <p><strong>Fecha:</strong> ${encontrado.fecha}</p>
-        <p><strong>ID:</strong> ${encontrado.id}</p>
-        <p><strong>Hash:</strong> ${encontrado.hash}</p>
-      `;
-    } else {
-      resultado.innerHTML = '<h2>❌ Certificado no encontrado o inválido</h2>';
+      if (id || hash) {
+        verificarCertificado(id || hash);
+      }
+    });
+
+    document.getElementById('formularioVerificar').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const entrada = document.getElementById('idCertificado').value.trim();
+      verificarCertificado(entrada);
+    });
+
+    function verificarCertificado(entrada) {
+      const certificados = JSON.parse(localStorage.getItem('certificados') || '[]');
+      const encontrado = certificados.find(cert => cert.id === entrada || cert.hash === entrada);
+      const resultado = document.getElementById('resultado');
+      resultado.innerHTML = '';
+
+      if (encontrado) {
+        resultado.innerHTML = `
+          <h2>✅ Certificado Válido</h2>
+          <p><strong>Nombre:</strong> ${encontrado.nombre}</p>
+          <p><strong>Curso:</strong> ${encontrado.curso}</p>
+          <p><strong>Fecha:</strong> ${encontrado.fecha}</p>
+          <p><strong>ID:</strong> ${encontrado.id}</p>
+          <p><strong>Hash:</strong> ${encontrado.hash}</p>
+        `;
+      } else {
+        resultado.innerHTML = '<h2>❌ Certificado no encontrado o inválido</h2>';
+      }
     }
-  });
-</script>
-
+  </script>
 </body>
 </html>
