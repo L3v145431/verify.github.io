@@ -107,17 +107,41 @@
       const hash = urlParams.get('hash');
 
       if (id || hash) {
-        verificarCertificado(id || hash);
+        const nombre = urlParams.get('nombre');
+        const curso = urlParams.get('curso');
+        const fecha = urlParams.get('fecha');
+        verificarCertificado(id, nombre, curso, fecha, hash);
       }
     });
 
     document.getElementById('formularioVerificar').addEventListener('submit', function(e) {
       e.preventDefault();
       const entrada = document.getElementById('idCertificado').value.trim();
-      verificarCertificado(entrada);
+      verificarCertificadoPorEntrada(entrada);
     });
 
-    function verificarCertificado(entrada) {
+    function verificarCertificado(id, nombre, curso, fecha, hash) {
+      const resultado = document.getElementById('resultado');
+      resultado.innerHTML = '';
+
+      const certificado = { id, nombre, curso, fecha, hash: hash };
+      const encontrado = validarCertificado(certificado);
+
+      if (encontrado) {
+        resultado.innerHTML = `
+          <h2>✅ Certificado Válido</h2>
+          <p><strong>Nombre:</strong> ${encontrado.nombre}</p>
+          <p><strong>Curso:</strong> ${encontrado.curso}</p>
+          <p><strong>Fecha:</strong> ${encontrado.fecha}</p>
+          <p><strong>ID:</strong> ${encontrado.id}</p>
+          <p><strong>Hash:</strong> ${encontrado.hash}</p>
+        `;
+      } else {
+        resultado.innerHTML = '<h2>❌ Certificado no encontrado o inválido</h2>';
+      }
+    }
+
+    function verificarCertificadoPorEntrada(entrada) {
       const certificados = JSON.parse(localStorage.getItem('certificados') || '[]');
       const encontrado = certificados.find(cert => cert.id === entrada || cert.hash === entrada);
       const resultado = document.getElementById('resultado');
@@ -135,6 +159,17 @@
       } else {
         resultado.innerHTML = '<h2>❌ Certificado no encontrado o inválido</h2>';
       }
+    }
+
+    function validarCertificado(certificado) {
+      const certificados = JSON.parse(localStorage.getItem('certificados') || '[]');
+      return certificados.find(cert =>
+        cert.id === certificado.id &&
+        cert.nombre === certificado.nombre &&
+        cert.curso === certificado.curso &&
+        cert.fecha === certificado.fecha &&
+        cert.hash === certificado.hash
+      );
     }
   </script>
 </body>
