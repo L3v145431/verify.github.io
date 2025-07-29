@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>Verificador de Certificados</title>
   <style>
+    /* (Tu mismo estilo CSS) */
     body {
       font-family: 'Arial', sans-serif;
       background-color: #121212;
@@ -72,22 +73,12 @@
       margin: 10px 0;
     }
     @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
     @keyframes slideUp {
-      from {
-        transform: translateY(50px);
-        opacity: 0;
-      }
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
+      from { transform: translateY(50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
   </style>
 </head>
@@ -97,80 +88,57 @@
     <input type="text" id="idCertificado" placeholder="Ingresa el ID o Hash del certificado" required />
     <button type="submit">Verificar</button>
   </form>
-  <div id="resultado">
-    <p>Ingresa un ID o Hash para verificar un certificado.</p>
-  </div>
+  <div id="resultado"></div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const id = urlParams.get('id');
-      const hash = urlParams.get('hash');
+    // 🔐 Reemplaza con tu configuración real de Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyBhkYGB03wGa83j10tEYgOvzUiUo_X2o40",
+      authDomain: "http:produccion-c4196.firebaseapp.com",
+      projectId: "produccion-c4196",
+    };
 
-      if (id || hash) {
-        const nombre = urlParams.get('nombre');
-        const curso = urlParams.get('curso');
-        const fecha = urlParams.get('fecha');
-        verificarCertificado(id, nombre, curso, fecha, hash);
-      }
-    });
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-    document.getElementById('formularioVerificar').addEventListener('submit', function(e) {
+    document.getElementById('formularioVerificar').addEventListener('submit', async function (e) {
       e.preventDefault();
       const entrada = document.getElementById('idCertificado').value.trim();
-      verificarCertificadoPorEntrada(entrada);
+      const resultado = document.getElementById('resultado');
+      resultado.innerHTML = 'Buscando...';
+
+      try {
+        const snapshot = await db.collection('certificados').get();
+        let encontrado = null;
+
+        snapshot.forEach(doc => {
+          const cert = doc.data();
+          if (cert.id === entrada || cert.hash === entrada) {
+            encontrado = cert;
+          }
+        });
+
+        if (encontrado) {
+          resultado.innerHTML = `
+            <h2>✅ Certificado Válido</h2>
+            <p><strong>Nombre:</strong> ${encontrado.nombre}</p>
+            <p><strong>Curso:</strong> ${encontrado.curso}</p>
+            <p><strong>Fecha:</strong> ${encontrado.fecha}</p>
+            <p><strong>ID:</strong> ${encontrado.id}</p>
+            <p><strong>Hash:</strong> ${encontrado.hash}</p>
+          `;
+        } else {
+          resultado.innerHTML = '<h2>❌ Certificado no encontrado o inválido</h2>';
+        }
+      } catch (error) {
+        console.error("Error al verificar:", error);
+        resultado.innerHTML = '<h2>⚠️ Error al conectar con la base de datos</h2>';
+      }
     });
-
-    function verificarCertificado(id, nombre, curso, fecha, hash) {
-      const resultado = document.getElementById('resultado');
-      resultado.innerHTML = '';
-
-      const certificado = { id, nombre, curso, fecha, hash: hash };
-      const encontrado = validarCertificado(certificado);
-
-      if (encontrado) {
-        resultado.innerHTML = `
-          <h2>✅ Certificado Válido</h2>
-          <p><strong>Nombre:</strong> ${encontrado.nombre}</p>
-          <p><strong>Curso:</strong> ${encontrado.curso}</p>
-          <p><strong>Fecha:</strong> ${encontrado.fecha}</p>
-          <p><strong>ID:</strong> ${encontrado.id}</p>
-          <p><strong>Hash:</strong> ${encontrado.hash}</p>
-        `;
-      } else {
-        resultado.innerHTML = '<h2>❌ Certificado no encontrado o inválido</h2>';
-      }
-    }
-
-    function verificarCertificadoPorEntrada(entrada) {
-      const certificados = JSON.parse(localStorage.getItem('certificados') || '[]');
-      const encontrado = certificados.find(cert => cert.id === entrada || cert.hash === entrada);
-      const resultado = document.getElementById('resultado');
-      resultado.innerHTML = '';
-
-      if (encontrado) {
-        resultado.innerHTML = `
-          <h2>✅ Certificado Válido</h2>
-          <p><strong>Nombre:</strong> ${encontrado.nombre}</p>
-          <p><strong>Curso:</strong> ${encontrado.curso}</p>
-          <p><strong>Fecha:</strong> ${encontrado.fecha}</p>
-          <p><strong>ID:</strong> ${encontrado.id}</p>
-          <p><strong>Hash:</strong> ${encontrado.hash}</p>
-        `;
-      } else {
-        resultado.innerHTML = '<h2>❌ Certificado no encontrado o inválido</h2>';
-      }
-    }
-
-    function validarCertificado(certificado) {
-      const certificados = JSON.parse(localStorage.getItem('certificados') || '[]');
-      return certificados.find(cert =>
-        cert.id === certificado.id &&
-        cert.nombre === certificado.nombre &&
-        cert.curso === certificado.curso &&
-        cert.fecha === certificado.fecha &&
-        cert.hash === certificado.hash
-      );
-    }
   </script>
 </body>
 </html>
