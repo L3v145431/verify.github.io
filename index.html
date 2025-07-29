@@ -4,11 +4,10 @@
   <meta charset="UTF-8">
   <title>Verificador de Certificados</title>
   <style>
-    /* (Tu mismo estilo CSS) */
     body {
       font-family: 'Arial', sans-serif;
-      background-color: #121212;
-      color: #e0e0e0;
+      background-color: #ffffff;
+      color: #050505;
       padding: 20px;
       margin: 0;
       display: flex;
@@ -17,14 +16,16 @@
       justify-content: center;
       min-height: 100vh;
     }
+
     h1 {
-      color: #bb86fc;
+      color: #FCD307;
       text-align: center;
       margin-bottom: 30px;
       animation: fadeIn 1.5s;
     }
+
     form {
-      background-color: #1e1e1e;
+      background-color: #E2E2E2;
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
@@ -32,50 +33,58 @@
       max-width: 400px;
       animation: slideUp 1s;
     }
+
     input[type="text"] {
       width: 95%;
       padding: 10px;
       margin: 10px 0;
-      border: 1px solid #bb86fc;
+      border: 1px solid #e2e1df;
       border-radius: 5px;
-      background-color: #2d2d2d;
-      color: #e0e0e0;
+      background-color: #FFFFFF;
+      color: #000000;
     }
+
     button[type="submit"] {
       width: 100%;
       padding: 10px;
-      background-color: #bb86fc;
-      color: #121212;
+      background-color: #FFBC00;
+      color: #000000;
       border: none;
       border-radius: 5px;
       cursor: pointer;
       font-weight: bold;
       transition: background-color 0.3s;
     }
+
     button[type="submit"]:hover {
-      background-color: #9a67ea;
+      background-color: #FCD307;
     }
+
     #resultado {
       margin-top: 20px;
       padding: 15px;
-      border: 1px solid #bb86fc;
-      background-color: #1e1e1e;
+      border: 1px solid #d6d4d0;
+      background-color: #E2E2E2;
       border-radius: 10px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
       width: 100%;
       max-width: 600px;
       animation: fadeIn 1.5s;
     }
+
     #resultado h2 {
-      color: #bb86fc;
+      color: #0f0f0f;
     }
+
     #resultado p {
       margin: 10px 0;
     }
+
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
     }
+
     @keyframes slideUp {
       from { transform: translateY(50px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
@@ -93,7 +102,6 @@
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-
   <script>
     // 🔐 Reemplaza con tu configuración real de Firebase
     const firebaseConfig = {
