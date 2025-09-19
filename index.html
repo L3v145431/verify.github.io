@@ -100,53 +100,56 @@
   <div id="resultado"></div>
 
   <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script>
-    // 🔐 Reemplaza con tu configuración real de Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyBhkYGB03wGa83j10tEYgOvzUiUo_X2o40",
-      authDomain: "http:produccion-c4196.firebaseapp.com",
-      projectId: "produccion-c4196",
-    };
+ <script>
+  // 🔐 Reemplaza con tu configuración real de Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyBhkYGB03wGa83j10tEYgOvzUiUo_X2o40",
+    authDomain: "http:produccion-c4196.firebaseapp.com",
+    projectId: "produccion-c4196",
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+  // Leer el parámetro certificateId de la URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const certificateId = urlParams.get('certificateId');
 
-    document.getElementById('formularioVerificar').addEventListener('submit', async function (e) {
-      e.preventDefault();
-      const entrada = document.getElementById('idCertificado').value.trim();
-      const resultado = document.getElementById('resultado');
-      resultado.innerHTML = 'Buscando...';
+  // Si hay un certificateId en la URL, colocarlo en el campo de entrada
+  if (certificateId) {
+    document.getElementById('idCertificado').value = certificateId;
+  }
 
-      try {
-        const snapshot = await db.collection('certificados').get();
-        let encontrado = null;
-
-        snapshot.forEach(doc => {
-          const cert = doc.data();
-          if (cert.id === entrada || cert.hash === entrada) {
-            encontrado = cert;
-          }
-        });
-
-        if (encontrado) {
-          resultado.innerHTML = `
-            <h2>✅ Certificado Válido</h2>
-            <p><strong>Nombre:</strong> ${encontrado.nombre}</p>
-            <p><strong>Curso:</strong> ${encontrado.curso}</p>
-            <p><strong>Fecha:</strong> ${encontrado.fecha}</p>
-            <p><strong>ID:</strong> ${encontrado.id}</p>
-            <p><strong>Hash:</strong> ${encontrado.hash}</p>
-          `;
-        } else {
-          resultado.innerHTML = '<h2>❌ Certificado no encontrado o inválido</h2>';
+  document.getElementById('formularioVerificar').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const entrada = document.getElementById('idCertificado').value.trim();
+    const resultado = document.getElementById('resultado');
+    resultado.innerHTML = 'Buscando...';
+    try {
+      const snapshot = await db.collection('certificados').get();
+      let encontrado = null;
+      snapshot.forEach(doc => {
+        const cert = doc.data();
+        if (cert.id === entrada || cert.hash === entrada) {
+          encontrado = cert;
         }
-      } catch (error) {
-        console.error("Error al verificar:", error);
-        resultado.innerHTML = '<h2>⚠️ Error al conectar con la base de datos</h2>';
+      });
+      if (encontrado) {
+        resultado.innerHTML = `
+          <h2>✅ Certificado Válido</h2>
+          <p><strong>Nombre:</strong> ${encontrado.nombre}</p>
+          <p><strong>Curso:</strong> ${encontrado.curso}</p>
+          <p><strong>Fecha:</strong> ${encontrado.fecha}</p>
+          <p><strong>ID:</strong> ${encontrado.id}</p>
+          <p><strong>Hash:</strong> ${encontrado.hash}</p>
+        `;
+      } else {
+        resultado.innerHTML = '<h2>❌ Certificado no encontrado o inválido</h2>';
       }
-    });
-  </script>
+    } catch (error) {
+      console.error("Error al verificar:", error);
+      resultado.innerHTML = '<h2>⚠️ Error al conectar con la base de datos</h2>';
+    }
+  });
+</script>
 </body>
 </html>
